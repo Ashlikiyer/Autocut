@@ -3,9 +3,8 @@ import { autoEdit, BadPlanError, planEdit } from "@/lib/ai/director";
 import { RateLimitedError } from "@/lib/ai/groq";
 import { planRequestSchema } from "@/lib/schemas";
 import {
-  clientIp,
   getSupabaseAdmin,
-  hashIp,
+  identifyVisitor,
   supabaseOptional,
 } from "@/lib/supabase";
 import { findUsageLog, setUsageStatus } from "@/lib/usage";
@@ -19,7 +18,7 @@ export async function POST(request: Request) {
   const db = getSupabaseAdmin();
   if (db) {
     try {
-      const log = await findUsageLog(db, usageId, hashIp(clientIp(request)));
+      const log = await findUsageLog(db, usageId, identifyVisitor(request));
       // Re-planning after a render is allowed (the user changed style or effects).
       if (!log) return apiError(400, "BAD_REQUEST", { message: "Invalid session" });
     } catch (err) {

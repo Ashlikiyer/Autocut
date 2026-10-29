@@ -42,6 +42,11 @@ export default function PrivacyPage() {
           A one-way hash of your IP address (SHA-256 with a secret salt), used only to apply the daily
           free limit. We never store your raw IP address.
         </li>
+        <li>
+          One cookie, <code>ac_vid</code>: a random ID with no personal information, so the free videos are
+          counted per browser and people sharing a Wi-Fi don&apos;t use up each other&apos;s videos. We store
+          only a salted hash of it. It isn&apos;t used for ads or tracking, and clearing your cookies removes it.
+        </li>
         <li>Ratings and comments you choose to send.</li>
       </ul>
 

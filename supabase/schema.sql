@@ -14,6 +14,8 @@ create table if not exists public.usage_logs (
   id bigint generated always as identity primary key,
   user_id uuid references auth.users (id) on delete set null,
   ip_hash text not null,
+  -- Salted hash of the anonymous browser ID (visitor cookie); null if cookies are blocked.
+  visitor_hash text,
   duration_sec numeric not null,
   preset text not null
     check (preset in ('energetic', 'clean', 'funny', 'podcast', 'creator')),
@@ -25,6 +27,8 @@ create table if not exists public.usage_logs (
 
 create index if not exists usage_logs_ip_recent
   on public.usage_logs (ip_hash, created_at desc);
+create index if not exists usage_logs_visitor_recent
+  on public.usage_logs (visitor_hash, created_at desc);
 create index if not exists usage_logs_user_recent
   on public.usage_logs (user_id, created_at desc);
 

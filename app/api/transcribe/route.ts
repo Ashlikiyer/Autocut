@@ -4,9 +4,8 @@ import { RateLimitedError, transcribeChunk } from "@/lib/ai/groq";
 import { LIMITS } from "@/lib/limits";
 import { transcribeFieldsSchema } from "@/lib/schemas";
 import {
-  clientIp,
   getSupabaseAdmin,
-  hashIp,
+  identifyVisitor,
   supabaseOptional,
 } from "@/lib/supabase";
 import { findUsageLog, setUsageStatus } from "@/lib/usage";
@@ -63,10 +62,9 @@ export async function POST(request: Request) {
 
   // Only callers holding a session from /api/session may transcribe.
   const db = getSupabaseAdmin();
-  const ipHash = db ? hashIp(clientIp(request)) : "";
   if (db) {
     try {
-      const log = await findUsageLog(db, usageId, ipHash);
+      const log = await findUsageLog(db, usageId, identifyVisitor(request));
       if (!log || log.status === "failed" || log.status === "rendered") {
         return apiError(400, "BAD_REQUEST", { message: "Invalid session" });
       }

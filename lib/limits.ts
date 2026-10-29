@@ -21,6 +21,8 @@ export const LIMITS = {
     "audio/m4a",
   ],
   defaultAnonDailyLimit: 3,
+  /** Per IP, across all browsers on it (shared Wi-Fi, carrier NAT). */
+  defaultAnonIpDailyLimit: 30,
   signedInDailyLimit: 10,
 } as const;
 

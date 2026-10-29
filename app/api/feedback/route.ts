@@ -1,9 +1,8 @@
 import { apiError, readJson } from "@/lib/api";
 import { feedbackSchema } from "@/lib/schemas";
 import {
-  clientIp,
   getSupabaseAdmin,
-  hashIp,
+  identifyVisitor,
   supabaseOptional,
 } from "@/lib/supabase";
 import { findUsageLog } from "@/lib/usage";
@@ -21,7 +20,7 @@ export async function POST(request: Request) {
 
   const { usageId, rating, comment } = parsed.data;
   try {
-    const log = await findUsageLog(db, usageId, hashIp(clientIp(request)));
+    const log = await findUsageLog(db, usageId, identifyVisitor(request));
     if (!log) return apiError(400, "BAD_REQUEST", { message: "Unknown session" });
 
     const { error } = await db

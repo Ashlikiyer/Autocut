@@ -1,7 +1,8 @@
 import "server-only";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { LIMITS } from "@/lib/limits";
+import { readVisitorId, visitorCookie } from "@/lib/visitor";
 
 let admin: SupabaseClient | null = null;
 
@@ -46,4 +47,35 @@ export function hashIp(ip: string): string {
 export function anonDailyLimit(): number {
   const n = Number(process.env.ANON_DAILY_LIMIT);
   return Number.isInteger(n) && n > 0 ? n : LIMITS.defaultAnonDailyLimit;
+}
+
+/** Videos a day for one IP across all its browsers (shared Wi-Fi, mobile carriers). */
+export function anonIpDailyLimit(): number {
+  const n = Number(process.env.ANON_IP_DAILY_LIMIT);
+  if (Number.isInteger(n) && n > 0) return n;
+  // Default: well above the per-browser limit, so a shared Wi-Fi isn't blocked.
+  return Math.max(LIMITS.defaultAnonIpDailyLimit, anonDailyLimit() * 10);
+}
+
+/** Who is asking: hashed IP and hashed browser ID (from the visitor cookie). */
+export interface Visitor {
+  ipHash: string;
+  visitorHash: string | null;
+  /** Set when a new visitor ID was issued: send it back as a Set-Cookie header. */
+  setCookie: string | null;
+}
+
+/**
+ * Identifies the visitor. With `issue`, a browser without a visitor cookie
+ * gets a new random ID (only used when starting a video).
+ */
+export function identifyVisitor(request: Request, issue = false): Visitor {
+  const ipHash = hashIp(clientIp(request));
+  let id = readVisitorId(request.headers.get("cookie"));
+  let setCookie: string | null = null;
+  if (!id && issue) {
+    id = randomUUID();
+    setCookie = visitorCookie(id, process.env.NODE_ENV === "production");
+  }
+  return { ipHash, visitorHash: id ? hashIp(`visitor:${id}`) : null, setCookie };
 }
