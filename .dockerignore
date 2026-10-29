@@ -1,0 +1,12 @@
+# Only render-server/ and public/fonts are needed to build the overlay image.
+**/node_modules
+.next
+.git
+.env*
+public/ffmpeg
+public/music
+public/sfx
+render-server/renders
+samplevid.mp4
+*.zip
+*.mp4

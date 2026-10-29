@@ -77,3 +77,33 @@ supabase/        schema.sql
 ## Deploy
 
 Push to GitHub, import in Vercel, add the env vars, then check `self.crossOriginIsolated === true` in DevTools on the live site.
+
+### HyperFrames overlay server (optional)
+
+The web app works without it (cards are then drawn in the browser). To get the
+HyperFrames animations online, run `render-server/` as a container. It needs
+about **1.2 GB of RAM** (headless Chrome) — 512 MB free tiers are too small.
+
+Build and test locally (from the repo root, so the caption fonts are included):
+
+```bash
+docker build -f render-server/Dockerfile -t autocut-overlay .
+docker run -p 4100:7860 -e ALLOWED_ORIGINS=http://localhost:3000 autocut-overlay
+curl http://localhost:4100/health
+```
+
+**Google Cloud Run** (free within the monthly allowance; needs a billing account):
+
+1. Cloud Run → *Deploy container* → *Service* → *Continuously deploy from a repository*,
+   connect the GitHub repo, branch `main`, build type **Dockerfile**,
+   source location **`/render-server/Dockerfile`** (build context: repo root).
+2. Settings: memory **2 GiB**, CPU **2**, request timeout **300 s**,
+   concurrency **1**, min instances **0**, max instances **2**,
+   authentication **Allow public access**.
+3. Variable: `ALLOWED_ORIGINS=https://<your-app>.vercel.app` (comma-separate several).
+4. In Vercel set `NEXT_PUBLIC_OVERLAY_URL=https://<service>.run.app` and **redeploy**
+   (`NEXT_PUBLIC_` values are baked in at build time).
+5. Add a budget alert (Billing → Budgets) so you hear about any charges.
+
+The server renders one job at a time and answers `429 BUSY` when 4 are queued;
+the app then falls back to browser-drawn cards, so the edit always finishes.
