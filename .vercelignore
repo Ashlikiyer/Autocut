@@ -1,0 +1,4 @@
+# The HyperFrames overlay server is not deployed on Vercel (it needs headless
+# Chrome, ~1.2 GB RAM and multi-minute renders). The live site draws cards in
+# the browser instead. See README → "HyperFrames overlay server".
+render-server
