@@ -1,0 +1,25 @@
+{
+  "name": "autocut-render-server",
+  "private": true,
+  "type": "module",
+  "description": "Renders AutoCut's animated overlays (captions, titles, text pops, emoji) to transparent WebM with HyperFrames. Never receives the user's video.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "poc": "tsx scripts/poc.ts",
+    "start": "tsx src/server.ts",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "ffmpeg-static": "5.2.0",
+    "ffprobe-static": "3.1.0",
+    "hyperframes": "0.8.210",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}

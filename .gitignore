@@ -39,3 +39,16 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ffmpeg.wasm files (copied from node_modules by scripts/copy-ffmpeg.mjs)
+/public/ffmpeg
+
+!.env.example
+
+# render-server (separate package)
+/render-server/node_modules
+/render-server/renders
+
+# local reference material (not ours to publish / too large)
+/samplevid.mp4
+/AutoCut UI design prototype.zip

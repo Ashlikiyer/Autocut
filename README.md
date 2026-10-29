@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AutoCut
 
-## Getting Started
+Free, browser-based auto-editor for short-form video. Upload a talking video, AutoCut cuts the pauses, and you download the MP4. The video never leaves the device; only a small compressed audio file is sent for transcription.
 
-First, run the development server:
+See `AutoCut — Project Documentation.md` for the full spec and roadmap.
+
+## Status: Phases 1–3
+
+**Creator style** (modelled on a reference edit)
+- One-word captions, mid-frame
+- AI-picked context pills ("₱0 · WALANG PAID COURSE"), STEP cards with a mock app window, focus titles over a blurred background, two-tone hook with sticker
+- Cards are drawn in the browser (Canvas) and animated by ffmpeg.wasm
+- Jump-cut zoom: alternating close/wide framing at each cut
+- **HyperFrames motion (optional):** `render-server/` animates the hook, pills, step cards and focus titles with HyperFrames + GSAP and returns a transparent WebM that ffmpeg.wasm composites in the browser. It receives only card text and timings, never the video. Without it, cards are drawn in the browser.
+  ```bash
+  cd render-server && npm install && npm start   # http://localhost:4100
+  ```
+  Set `NEXT_PUBLIC_OVERLAY_URL=http://localhost:4100` (restart `npm run dev`). For production, host it (e.g. an Oracle Cloud Always Free VM) and set `ALLOWED_ORIGINS` to your site.
+- Database: run `supabase/migrations/002_creator_preset.sql` to allow the new style
+
+**Phase 2–3 (editing features)**
+- Style presets: Energetic, Clean, Funny, Podcast
+- Animated word-by-word captions (ASS subtitles, Poppins / Bangers fonts)
+- Filler-word removal (English + Filipino: um, uh, ano, parang, standalone "like", "you know", sentence-start "kasi")
+- Vertical 9:16 crop
+- AI director (`/api/plan`, Groq `openai/gpt-oss-120b`) plans zooms, emoji, text pops, SFX, hook title and music mood; validated with Zod and capped per preset, with a rule-based fallback
+- Flash transitions with whooshes, camera shake (Funny), progress bar
+- 12 synthesized SFX and 4 synthesized music loops (`npm run make:sfx`, `npm run make:music`), or upload your own music; music auto-ducks under speech
+- Loudness normalization (-14 LUFS) on export
+- Effects are applied to edits up to 3 minutes long
+
+**Phase 1 (MVP)**
+
+- Upload with length (15 min), size (500 MB) and format (MP4/MOV/WebM) checks
+- ffmpeg.wasm in the browser (multithreaded when cross-origin isolated)
+- Audio extraction to mono 16 kHz Opus, chunked under 4 MB
+- `/api/transcribe` → Groq Whisper with word timestamps
+- Silence cutting from word gaps, with ffmpeg `silencedetect` as a second check
+- 480p preview render, full-quality render on download
+- `/api/session` daily limit (3/day anonymous) with Supabase usage logs
+- `/api/feedback` ratings
+
+## Setup
+
+Requires Node.js 20+, a free [Groq](https://console.groq.com) account and a free [Supabase](https://supabase.com) project.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # fill in the keys
+npm run dev                  # http://localhost:3000 in desktop Chrome
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. Run `supabase/schema.sql` in the Supabase SQL editor (creates tables + RLS).
+2. `npm run dev` and `npm run build` copy the ffmpeg.wasm files into `public/ffmpeg` automatically (`npm run copy:ffmpeg`).
+3. Without Supabase keys, local dev runs with no daily limit and no logging. In production, missing keys return `UPSTREAM_ERROR`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server |
+| `npm run build` | Production build |
+| `npm test` | Unit tests (Vitest) for the engine and schemas |
+| `npm run lint` | ESLint |
 
-## Learn More
+## Layout
 
-To learn more about Next.js, take a look at the following resources:
+```text
+app/             pages + API routes (session, transcribe, feedback)
+components/      upload, style-picker, progress, preview, editor
+hooks/           useFFmpeg (load once), usePipeline (runs all stages)
+lib/engine/      pure media engine: cuts, edl, filtergraph, audio, render, probe
+lib/ai/groq.ts   server-side Groq client
+supabase/        schema.sql
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Push to GitHub, import in Vercel, add the env vars, then check `self.crossOriginIsolated === true` in DevTools on the live site.

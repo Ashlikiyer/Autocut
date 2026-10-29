@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // ffmpeg.wasm files copied from node_modules
+    "public/ffmpeg/**",
+    // Separate package with its own tooling
+    "render-server/**",
   ]),
 ]);
 

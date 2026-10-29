@@ -1,0 +1,28 @@
+{
+  "tracks": [
+    {
+      "file": "upbeat-1.ogg",
+      "mood": "upbeat",
+      "title": "Bright Steps",
+      "credit": "Synthesized by AutoCut (scripts/make-music.mjs)"
+    },
+    {
+      "file": "chill-1.ogg",
+      "mood": "chill",
+      "title": "Soft Window",
+      "credit": "Synthesized by AutoCut (scripts/make-music.mjs)"
+    },
+    {
+      "file": "playful-1.ogg",
+      "mood": "playful",
+      "title": "Bouncy Marbles",
+      "credit": "Synthesized by AutoCut (scripts/make-music.mjs)"
+    },
+    {
+      "file": "dramatic-1.ogg",
+      "mood": "dramatic",
+      "title": "Long Shadow",
+      "credit": "Synthesized by AutoCut (scripts/make-music.mjs)"
+    }
+  ]
+}
