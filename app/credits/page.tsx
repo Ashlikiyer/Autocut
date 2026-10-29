@@ -6,6 +6,7 @@ export const metadata: Metadata = { title: "Credits" };
 // Keep in sync with CREDITS.md. Every bundled asset must be listed here.
 const LIBRARIES = [
   { name: "FFmpeg / ffmpeg.wasm", license: "LGPL / GPL (core), MIT (wrapper)", url: "https://github.com/ffmpegwasm/ffmpeg.wasm" },
+  { name: "HyperFrames (card animations)", license: "Apache-2.0", url: "https://github.com/heygen-com/hyperframes" },
   { name: "Geist font", license: "SIL Open Font License 1.1", url: "https://vercel.com/font" },
   { name: "Poppins font (captions)", license: "SIL Open Font License 1.1", url: "https://github.com/google/fonts/tree/main/ofl/poppins" },
   { name: "Bangers font (captions)", license: "SIL Open Font License 1.1", url: "https://github.com/google/fonts/tree/main/ofl/bangers" },

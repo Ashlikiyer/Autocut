@@ -92,7 +92,12 @@ docker run -p 4100:7860 -e ALLOWED_ORIGINS=http://localhost:3000 autocut-overlay
 curl http://localhost:4100/health
 ```
 
-**Google Cloud Run** (free within the monthly allowance; needs a billing account):
+**Free-only setup (default):** don't host it. Leave `NEXT_PUBLIC_OVERLAY_URL` unset on
+Vercel and the live site draws the cards in the browser (still animated: fade, slide,
+pop, bounce). HyperFrames keeps working on your own machine with `npm start`.
+
+**Google Cloud Run** — only if you accept adding a card. It has a monthly free
+allowance, but it is a billing account and usage beyond the allowance is charged:
 
 1. Cloud Run → *Deploy container* → *Service* → *Continuously deploy from a repository*,
    connect the GitHub repo, branch `main`, build type **Dockerfile**,

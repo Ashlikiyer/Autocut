@@ -9,6 +9,7 @@ Keep this file in sync with `app/credits/page.tsx`.
 | Name | License | Source |
 | --- | --- | --- |
 | FFmpeg / ffmpeg.wasm (`public/ffmpeg`, copied at build time) | LGPL/GPL (core), MIT (wrapper) | https://github.com/ffmpegwasm/ffmpeg.wasm |
+| HyperFrames (optional overlay server, `render-server/`) | Apache-2.0 | https://github.com/heygen-com/hyperframes |
 | shadcn/ui, Base UI | MIT | https://ui.shadcn.com |
 | Lucide icons | ISC | https://lucide.dev |
 
